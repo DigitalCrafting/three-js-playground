@@ -1,0 +1,11 @@
+.nav-link-home {
+  @apply w-10 h-10 rounded-lg bg-white items-center justify-center flex font-bold shadow-md
+}
+
+.nav-link {
+  @apply text-black
+}
+
+.nav-link-active {
+  @apply text-blue-600
+}
