@@ -4,6 +4,8 @@ import * as THREE from 'three';
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import MODEL_LOADER from '../../graphics/model.loader';
 import {GLTF} from "three/examples/jsm/loaders/GLTFLoader";
+import {Cache} from "three";
+import enabled = Cache.enabled;
 
 @Component({
   selector: 'app-canvas',
@@ -63,13 +65,6 @@ export class CanvasComponent implements OnInit {
     let islandModel = islandGLTF.scene;
     let droneModel = droneGLTF.scene;
 
-    droneModel.position.set(
-      islandModel.position.x - 30,
-      islandModel.position.y + 20,
-      islandModel.position.z,
-    );
-    droneModel.scale.set(0.5, 0.5, 0.5)
-    droneModel.lookAt(islandModel.position);
 
     this.scene.add(islandModel, droneModel);
     this.scene.add(this.camera);
@@ -95,13 +90,39 @@ export class CanvasComponent implements OnInit {
       renderer.render(this.scene, this.camera);
     });
 
+    let moveDirection: 'left' | 'right' | undefined = undefined;
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'a') {
+        moveDirection = 'left';
+      } else if (event.key === 'd') {
+        moveDirection = 'right';
+      } else {
+        moveDirection = undefined;
+      }
+    });
+    window.addEventListener('keyup', () => {
+      moveDirection = undefined;
+    });
+
     const clock = new THREE.Clock();
     this.camera.lookAt(islandModel.position);
+    let lastAngle = Math.PI * 0.2;
+    droneModel.position.x = Math.cos(lastAngle) * 30;
+    droneModel.position.y = islandModel.position.y + 20;
+    droneModel.position.z = Math.sin(lastAngle) * 30;
+    droneModel.scale.set(0.5, 0.5, 0.5)
+    droneModel.lookAt(islandModel.position);
+
     const animateGeometry = () => {
-      const elapsedTime = clock.getElapsedTime();
-      if (droneModel) {
-        droneModel.position.x = Math.cos(elapsedTime + Math.PI * 0.2) * 30;
-        droneModel.position.z = Math.sin(elapsedTime + Math.PI * 0.2) * 30;
+
+      if (droneModel && moveDirection === 'left' || moveDirection === 'right') {
+        if (moveDirection === 'left') {
+          lastAngle += 0.05;
+        } else if (moveDirection === 'right') {
+          lastAngle -= 0.05;
+        }
+        droneModel.position.x = Math.cos(lastAngle) * 30;
+        droneModel.position.z = Math.sin(lastAngle) * 30;
         droneModel.lookAt(islandModel.position);
       }
 
