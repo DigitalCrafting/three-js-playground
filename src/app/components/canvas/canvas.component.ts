@@ -4,8 +4,28 @@ import * as THREE from 'three';
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import MODEL_LOADER from '../../graphics/model.loader';
 import {GLTF} from "three/examples/jsm/loaders/GLTFLoader";
-import {Cache} from "three";
-import enabled = Cache.enabled;
+
+const mainView = {
+  left: 0,
+  bottom: 0,
+  width: 1.0,
+  height: 1.0,
+  background: new THREE.Color(),
+  eye: [0, 300, 1800],
+  up: [0, 1, 0],
+  fov: 30
+};
+
+const droneView = {
+  left: 0.75,
+  bottom: 0,
+  width: 0.25,
+  height: 0.25,
+  background: new THREE.Color().setRGB(0.5, 0.5, 0.7, THREE.SRGBColorSpace),
+  eye: [0, 300, 1800],
+  up: [0, 1, 0],
+  fov: 30
+};
 
 @Component({
   selector: 'app-canvas',
@@ -26,6 +46,12 @@ export class CanvasComponent implements OnInit {
   };
   private camera = new THREE.PerspectiveCamera(
     75,
+    this.canvasSizes.width / this.canvasSizes.height,
+    0.001,
+    1000
+  );
+  private droneCamera = new THREE.PerspectiveCamera(
+    50,
     this.canvasSizes.width / this.canvasSizes.height,
     0.001,
     1000
@@ -113,8 +139,12 @@ export class CanvasComponent implements OnInit {
     droneModel.scale.set(0.5, 0.5, 0.5)
     droneModel.lookAt(islandModel.position);
 
-    const animateGeometry = () => {
+    droneModel.add(this.droneCamera);
+    this.droneCamera.position.set(0, 0, 5);
+    this.droneCamera.lookAt(islandModel.position);
 
+    const animateGeometry = () => {
+      // Move drone
       if (droneModel && moveDirection === 'left' || moveDirection === 'right') {
         if (moveDirection === 'left') {
           lastAngle += 0.05;
@@ -124,10 +154,41 @@ export class CanvasComponent implements OnInit {
         droneModel.position.x = Math.cos(lastAngle) * 30;
         droneModel.position.z = Math.sin(lastAngle) * 30;
         droneModel.lookAt(islandModel.position);
+
+        this.droneCamera.updateProjectionMatrix();
+        this.droneCamera.position.set(0, 0, 5);
+        this.droneCamera.lookAt(islandModel.position);
       }
 
-      // Render
+      // Set viewports
+      // Main
+      const mainLeft = Math.floor( this.canvasSizes.width * mainView.left );
+      const mainBottom = Math.floor( this.canvasSizes.height * mainView.bottom );
+      const mainWidth = Math.floor( this.canvasSizes.width * mainView.width );
+      const mainHeight = Math.floor( this.canvasSizes.height * mainView.height );
+
+      renderer.setViewport( mainLeft, mainBottom, mainWidth, mainHeight );
+      renderer.setScissor( mainLeft, mainBottom, mainWidth, mainHeight);
+      renderer.setScissorTest( true );
+      renderer.setClearColor( mainView.background );
+
+      // Render main viewport
       renderer.render(this.scene, this.camera);
+
+      // Drone
+      const droneLeft = Math.floor( this.canvasSizes.width * droneView.left );
+      const droneBottom = Math.floor( this.canvasSizes.height * droneView.bottom );
+      const droneWidth = Math.floor( this.canvasSizes.width * droneView.width );
+      const droneHeight = Math.floor( this.canvasSizes.height * droneView.height );
+
+      renderer.setViewport( droneLeft, droneBottom, droneWidth, droneHeight );
+      renderer.setScissor( droneLeft, droneBottom, droneWidth, droneHeight );
+      renderer.setScissorTest( true );
+      renderer.setClearColor( droneView.background );
+
+      // Render drone viewport
+      renderer.render(this.scene, this.droneCamera);
+
       controls.update();
 
       // Call animateGeometry again on the next frame
