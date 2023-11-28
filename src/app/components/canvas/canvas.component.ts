@@ -51,7 +51,7 @@ export class CanvasComponent implements OnInit {
     1000
   );
   private droneCamera = new THREE.PerspectiveCamera(
-    50,
+    75,
     this.canvasSizes.width / this.canvasSizes.height,
     0.001,
     1000
@@ -173,6 +173,7 @@ export class CanvasComponent implements OnInit {
       renderer.setClearColor( mainView.background );
 
       // Render main viewport
+      this.scene.background = mainView.background;
       renderer.render(this.scene, this.camera);
 
       // Drone
@@ -187,6 +188,7 @@ export class CanvasComponent implements OnInit {
       renderer.setClearColor( droneView.background );
 
       // Render drone viewport
+      this.scene.background = droneView.background;
       renderer.render(this.scene, this.droneCamera);
 
       controls.update();
