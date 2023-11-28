@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CanvasBoxComponent } from './canvas-box.component';
+import { CanvasComponent } from './canvas.component';
 
 describe('CanvasBoxComponent', () => {
-  let component: CanvasBoxComponent;
-  let fixture: ComponentFixture<CanvasBoxComponent>;
+  let component: CanvasComponent;
+  let fixture: ComponentFixture<CanvasComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CanvasBoxComponent]
+      imports: [CanvasComponent]
     })
     .compileComponents();
-    
-    fixture = TestBed.createComponent(CanvasBoxComponent);
+
+    fixture = TestBed.createComponent(CanvasComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
