@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {CanvasComponent} from "../canvas/canvas.component";
+import {DronePreview} from "../canvas/drone-preview.component";
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, CanvasComponent],
+  imports: [CommonModule, DronePreview],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
