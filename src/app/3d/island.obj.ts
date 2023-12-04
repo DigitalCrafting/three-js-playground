@@ -1,5 +1,5 @@
 import {GLTF} from "three/examples/jsm/loaders/GLTFLoader";
-import MODEL_LOADER from "../graphics/model.loader";
+import MODEL_LOADER from "./model.loader";
 import {Group, Object3D} from "three";
 import {Vector3} from "three/src/math/Vector3";
 import {ThreeObj} from "./3d-interfaces";

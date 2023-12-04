@@ -1,12 +1,17 @@
 import {GLTF} from "three/examples/jsm/loaders/GLTFLoader";
-import MODEL_LOADER from "../graphics/model.loader";
+import MODEL_LOADER from "./model.loader";
 import {Group, Object3D} from "three";
 import {ThreeObj} from "./3d-interfaces";
 import {Vector3} from "three/src/math/Vector3";
+import * as THREE from "three";
 
 export class DroneObj implements ThreeObj {
   private gltfObj: GLTF;
   private _model: Group;
+  private _animationMixer: THREE.AnimationMixer;
+  private _animationActions: THREE.AnimationAction[] = [];
+  private _activeAction: THREE.AnimationAction;
+  private _lastAction: THREE.AnimationAction;
   /**
    * Drone is circling around the center of the screen,
    * where island is. The angle is used to calculate
@@ -24,6 +29,22 @@ export class DroneObj implements ThreeObj {
 
   public get position(): Vector3 {
     return this._model.position;
+  }
+
+  get animationMixer(): THREE.AnimationMixer {
+    return this._animationMixer;
+  }
+
+  get animationActions(): THREE.AnimationAction[] {
+    return this._animationActions;
+  }
+
+  get activeAction(): THREE.AnimationAction {
+    return this._activeAction;
+  }
+
+  get lastAction(): THREE.AnimationAction {
+    return this._lastAction;
   }
 
   public set moveDirection(value: DroneMoveDirection) {
@@ -66,7 +87,14 @@ export class DroneObj implements ThreeObj {
 
     // Load model
     drone.gltfObj = await MODEL_LOADER.loadGLTF('/assets/drone.glb');
+    console.dir(drone.gltfObj);
     drone._model = drone.gltfObj.scene;
+    drone._animationMixer = new THREE.AnimationMixer(drone._model);
+
+    const animationAction = drone._animationMixer.clipAction(drone.gltfObj.animations[0]);
+
+    drone._animationActions.push(animationAction);
+    drone._activeAction = drone._animationActions[0];
 
     // Set default values
     drone._angle = Math.PI * 0.2;

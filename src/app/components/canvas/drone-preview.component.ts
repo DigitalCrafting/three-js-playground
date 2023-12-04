@@ -98,12 +98,14 @@ export class DronePreview implements OnInit, AfterViewInit {
 
     this.mainCamera.lookAt(this.islandObj.position);
 
+    this.droneObj.activeAction.reset().play();
     this.droneObj.lookAt(this.islandObj.position);
     this.droneObj.add(this.droneCamera);
 
     this.droneCamera.position.set(0, 0, 5);
     this.droneCamera.lookAt(this.islandObj.position);
 
+    const clock = new THREE.Clock();
     /* ==== Main loop ==== */
     const animateGeometry = () => {
       controls.update();
@@ -112,6 +114,7 @@ export class DronePreview implements OnInit, AfterViewInit {
       this.renderViewPorts();
 
       // Call animateGeometry again on the next frame
+      this.droneObj.animationMixer.update(clock.getDelta());
       window.requestAnimationFrame(animateGeometry);
     };
 
